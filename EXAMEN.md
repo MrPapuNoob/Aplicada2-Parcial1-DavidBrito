@@ -2,9 +2,12 @@ Contexto
 Una biblioteca necesita un sistema para gestionar sus libros y préstamos. Debes construir una API REST desde cero aplicando todo lo visto en clase.
 
 Modelos
+
 prisma
 model Usuario {   id        Int       @id @default(autoincrement())   nombre    String   email     String    @unique   password  String   rol       String    @default("usuario")   prestamos Prestamo[] } model Libro {   id          Int       @id @default(autoincrement())   titulo      String   autor       String   disponible  Boolean   @default(true)   prestamos   Prestamo[] } model Prestamo {   id         Int      @id @default(autoincrement())   fechaInicio DateTime @default(now())   fechaFin   DateTime?   usuario    Usuario  @relation(fields: [usuarioId], references: [id])   usuarioId  Int   libro      Libro    @relation(fields: [libroId], references: [id])   libroId    Int }
 Endpoints requeridos
+
+
 Autenticación — públicos:
 
 POST	/auth/registro	Registrar usuario
@@ -31,10 +34,10 @@ Deben seguir la arquitectura por capas vista en clase:
 
 api-examen/ ├── prisma/ │   
             └── schema.prisma 
-            ├── src/ │   
-            ├── controllers/ │   
-            ├── routes/ │   
-            ├── middlewares/ 
+            ├── src/ 
+            │   ├── controllers/ 
+            │   ├── routes/ 
+            │   ├── middlewares/ 
             │   └── db.js 
             ├── .env 
             └── src/index.js

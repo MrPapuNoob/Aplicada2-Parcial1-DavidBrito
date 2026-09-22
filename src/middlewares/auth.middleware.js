@@ -12,7 +12,7 @@ export const verificarToken = (req, res, next) => {
     req.usuario = decoded
     next()
   } catch {
-    res.status(401).json({ error: "Token inválido" })
+    res.status(401).json({ error: "Token invalido" })
   }
 }
 
