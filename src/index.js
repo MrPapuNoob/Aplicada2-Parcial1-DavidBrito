@@ -1,7 +1,7 @@
 import "dotenv/config"
 import express from "express"
-import librosRoutes from "./src/routes/libros.routes.js"
-import authRoutes from "./src/routes/authRoute.js"
+import librosRoutes from "/routes/libros.routes.js"
+import authRoutes from "/routes/authRoute.js"
 
 const app = express()
 app.use(express.json())
