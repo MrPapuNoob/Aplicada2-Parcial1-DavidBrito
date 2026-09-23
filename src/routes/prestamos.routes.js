@@ -3,8 +3,8 @@ import {getPrestamos, createPrestamo, deletePrestamo} from "../controllers/prest
 
 const router = Router()
 
-router.get("/prestamos", getPrestamos)
-router.post("/prestamos", createPrestamo)
-router.delete("/prestamos/:id", deletePrestamo)
+router.get("/", getPrestamos)
+router.post("/", createPrestamo)
+router.delete("/:id", deletePrestamo)
 
 export default router

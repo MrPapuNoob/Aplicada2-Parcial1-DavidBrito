@@ -3,8 +3,7 @@ import { getLibros,createLibro,deleteLibro  } from "../controllers/libros.contro
 
 const router = Router()
 
-router.get("/libros", getLibros)
-router.post("/libros", createLibro)
-router.delete("/libros/:id", deleteLibro)
+router.get("/", getLibros)
+router.delete("/:id", deleteLibro)
 
 export default router
