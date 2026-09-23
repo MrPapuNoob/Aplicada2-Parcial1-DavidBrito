@@ -1,7 +1,7 @@
-import {router} from "express"
+import {Router} from "express"
 import {getPrestamos, createPrestamo, deletePrestamo} from "../controllers/prestamos.controller.js"
 
-const router = router()
+const router = Router()
 
 router.get("/prestamos", getPrestamos)
 router.post("/prestamos", createPrestamo)
