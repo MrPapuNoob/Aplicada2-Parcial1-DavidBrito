@@ -1,86 +1,76 @@
-import {prisma} from "../db.js"
+import { prisma } from "../db.js"
 
-export const postPrestamo = async (req, res) => {
+export const createPrestamo = async (req, res, next) => {
   try {
-    const { usuarioId, libroId } = req.body
-    const where = req.libro.disponible === "true" ? { id } : { id, usuarioId: req.usuario.id }
+    const { libroId } = req.body
+    const libro = await prisma.libro.findUnique({ where: { id: Number(libroId) } })
+    if (!libro) return res.status(404).json({ error: "Libro no encontrado" })
+    if (!libro.disponible) return res.status(400).json({ error: "Libro no disponible" })
+
+    await prisma.libro.update({
+      where: { id: libro.id },
+      data: { disponible: false }
+    })
+
     const prestamo = await prisma.prestamo.create({
       data: {
-        usuarioId,
-        libroId
+        libroId: libro.id,
+        usuarioId: req.usuario.id
       }
     })
     res.status(201).json(prestamo)
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: "Error al crear el prestamo" })
+  } catch (err) {
+    next(err)
   }
 }
 
-export const getPrestamos = async (req, res) => {
+export const devolverPrestamo = async (req, res, next) => {
   try {
-    const where = req.usuario.rol === "admin" ? { id } : { id, usuarioId: req.usuario.id }
-    await prisma.prestamo.findMany({
-      where: { where }
+    const { id } = req.params
+    const prestamo = await prisma.prestamo.findUnique({ where: { id: Number(id) } })
+    if (!prestamo) return res.status(404).json({ error: "Prestamo no encontrado" })
+    if (prestamo.usuarioId !== req.usuario.id) {
+      return res.status(403).json({ error: "No autorizado" })
+    }
+    if (prestamo.fechaFin) {
+      return res.status(400).json({ error: "El libro ya fue devuelto" })
+    }
+
+    const prestamoActualizado = await prisma.prestamo.update({
+      where: { id: prestamo.id },
+      data: { fechaFin: new Date() }
     })
-    res.status(200).json({ message: "Prestamos obtenidos correctamente" })
-  } catch (err) { next(err) }
-   
+
+    await prisma.libro.update({
+      where: { id: prestamo.libroId },
+      data: { disponible: true }
+    })
+
+    res.json(prestamoActualizado)
+  } catch (err) {
+    next(err)
+  }
 }
-export const getPrestamoPropios = async (req, res) => {
+
+export const getPrestamos = async (req, res, next) => {
   try {
     const prestamos = await prisma.prestamo.findMany({
-      where: { usuarioId: req.usuario.id }
+      include: { libro: true, usuario: true }
     })
     res.json(prestamos)
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: "Error al obtener los prestamos" })
+  } catch (err) {
+    next(err)
   }
 }
 
-export const putPrestamo = async (req, res) => {
+export const getPrestamosPropios = async (req, res, next) => {
   try {
-    const { id } = req.params
-    const { userId, libroId } = req.body
-    const prestamo = await prisma.prestamo.update({
-      where: { id },
-      data: { userId, libroId }
+    const prestamos = await prisma.prestamo.findMany({
+      where: { usuarioId: req.usuario.id },
+      include: { libro: true }
     })
-    res.json(prestamo)
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: "Error al actualizar el prestamo" })
-  }
-}
-
-export const createPrestamo = async (req, res) => {
-  try {
-    const { userId, libroId } = req.body
-    const prestamo = await prisma.prestamo.create({
-      data: {
-        userId,
-        libroId
-      }
-    })
-    res.json(prestamo)
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: "Error al crear el prestamo" })
-  }
-}
-
-export const deletePrestamo = async (req, res) => {
-  try {
-    const { id } = req.params
-    const prestamo = await prisma.prestamo.delete({
-      where: {
-        id
-      }
-    })
-    res.json(prestamo)
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: "Error al eliminar el prestamo" })
+    res.json(prestamos)
+  } catch (err) {
+    next(err)
   }
 }

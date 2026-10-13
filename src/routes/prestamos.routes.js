@@ -1,10 +1,18 @@
-import {Router} from "express"
-import {getPrestamos, createPrestamo, deletePrestamo} from "../controllers/prestamos.controller.js"
+import { Router } from "express"
+import {
+  createPrestamo,
+  devolverPrestamo,
+  getPrestamos,
+  getPrestamosPropios
+} from "../controllers/prestamos.controller.js"
+import { verificarToken, soloAdmin } from "../middlewares/auth.middleware.js"
+import { validarPrestamo, validarId } from "../middlewares/validacion.middleware.js"
 
 const router = Router()
 
-router.get("/", getPrestamos)
-router.post("/", createPrestamo)
-router.delete("/:id", deletePrestamo)
+router.get("/", verificarToken, soloAdmin, getPrestamos)
+router.get("/mis-prestamos", verificarToken, getPrestamosPropios)
+router.post("/", verificarToken, validarPrestamo, createPrestamo)
+router.put("/:id/devolver", verificarToken, validarId, devolverPrestamo)
 
 export default router

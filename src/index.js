@@ -1,13 +1,14 @@
 import "dotenv/config"
 import express from "express"
+import { logger } from "./middlewares/logger.middleware.js"
 import librosRoutes from "./routes/libros.routes.js"
 import authRoutes from "./routes/authRoute.js"
 import prestamosRouter from "./routes/prestamos.routes.js"
 
 const app = express()
+app.use(logger)
 app.use(express.json())
-app.use("/auth/registro", authRoutes)
-app.use("/auth/login", authRoutes)
+app.use("/auth", authRoutes)
 app.use("/libros", librosRoutes)
 app.use("/prestamos", prestamosRouter)
 
