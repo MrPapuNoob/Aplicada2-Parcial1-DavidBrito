@@ -5,6 +5,9 @@ import jwt from "jsonwebtoken"
 export const registro = async (req, res, next) => {
   try {
     const { nombre, email, password, rol } = req.body
+    if (rol && rol !== "usuario") {
+      return res.status(403).json({ error: "No autorizado" })
+    }
     const existe = await prisma.usuario.findUnique({ where: { email } })
     if (existe) return res.status(400).json({ error: "Email ya registrado" })
 
